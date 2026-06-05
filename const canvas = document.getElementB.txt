@@ -1,0 +1,65 @@
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const balls = [
+    {X: 300, Y: 250, R: 50},
+    {X: 200, Y: 500, R: 75}
+];
+
+function resizeCanvas(){
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = canvas.clientWidth * dpr;
+    canvas.height = canvas.clientHeight * dpr;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+   
+}
+
+function drawBall(x, y, r) {
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
+
+    ctx.fillStyle = "red";
+    ctx.fill();
+
+    ctx.strokeStyle = "black";
+    ctx.stroke();
+}
+
+function draw(){
+    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+
+    for (let ball of balls) {
+        drawBall(ball.X, ball.Y, ball.R);
+    }
+}
+
+canvas.addEventListener('keydown', (e)=>{
+    if(e.keyCode === 38){
+        //up
+      balls[1].Y -= 5;
+    }
+
+    if(e.keyCode === 40){
+        //down
+      balls[1].Y += 5;
+    }
+
+    if(e.keyCode === 37){
+        //left
+      balls[1].X -= 5;
+    }
+
+    if(e.keyCode === 39){
+        //right
+      balls[1].X += 5;
+    }
+
+    draw();
+});
+
+
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
