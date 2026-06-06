@@ -19,7 +19,11 @@ class Ball{
         this.x = x;
         this.y = y;
         this.r = r;
-        this.velocity = 15;
+        this.vel_x = 0;
+        this.vel_y = 0;
+        this.acc_x=0;
+        this.acc_y=0;
+        this.acceleration=1;
         this.player = false;
         BALLS.push(this);
     }
@@ -80,20 +84,34 @@ function keyControl(b){
     });
 
         if(UP){
-            b.y -= b1.velocity;
+            b.acc_y = -b.acceleration;
         }
 
         if(DOWN){
-            b.y += b.velocity;
+            b.acc_y = b.acceleration;
         }
 
         if(LEFT){
-            b.x -= b.velocity;
+            b.acc_x = -b.acceleration;
         }
 
         if(RIGHT){
-            b.x += b.velocity;
+            b.acc_x = b.acceleration;
         }
+
+        if((!UP) && (!DOWN)){
+            b.acc_y = 0;
+        }
+
+        if((!LEFT) && (!RIGHT)){
+            b.acc_x = 0;
+        }
+
+        b.vel_x += b.acc_x;
+        b.vel_y += b.acc_y;
+
+        b.x += b.vel_x;
+        b.y += b.vel_y;
 }
 
 function mainLoop(){
@@ -110,13 +128,11 @@ function mainLoop(){
 }
 
 let b1 = new Ball(200, 200, 50);
-
 b1.player = true;
 
 requestAnimationFrame(mainLoop);
 
 resizeCanvas();
-drawBall(x, y, r);
 
 window.addEventListener("resize", () => {
     resizeCanvas();
