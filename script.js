@@ -13,16 +13,46 @@ function resizeCanvas() {
 const BALLS = [];
 
 let LEFT, RIGHT, UP, DOWN;
+let friction = 0.1;
 
+class Vector{
+    constructor(x, y){
+        this.x = x;
+        this.y = y;
+    }
+
+    add(v){
+        return new Vector(this.x + v.x, this.y + v.y);
+    }
+
+    subtr(v){
+        return new Vector(this.x - v.x, this.y - v.y);
+    }
+
+    mag(){
+        return Math.sqrt(this.x**2, this.y**2);
+    }
+
+    mul(n){
+        return new Vector(this.x*n, this.y*n);
+    }
+
+    drawVec(start_x, start_y, n, color){
+        ctx.beginPath();
+        ctx.moveTo(start_x, start_y);
+        ctx.lineTo(start_x + this.x*n, start_y + this.y*n);
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        ctx.closePath();
+    }
+}
 class Ball{
     constructor(x, y, r){
         this.x = x;
         this.y = y;
         this.r = r;
-        this.vel_x = 0;
-        this.vel_y = 0;
-        this.acc_x=0;
-        this.acc_y=0;
+        this.vel = new Vector(0,0);
+        this.acc = new Vector(0,0);
         this.acceleration=1;
         this.player = false;
         BALLS.push(this);
@@ -35,6 +65,12 @@ class Ball{
         ctx.stroke();
         ctx.fillStyle = "red";
         ctx.fill();
+    }
+
+    display(){
+        this.vel.drawVec(this.x, this.y, 10, "green");
+        this.acc.drawVec(this.x, this.y, 100, "blue");
+
     }
 }
 
@@ -84,34 +120,34 @@ function keyControl(b){
     });
 
         if(UP){
-            b.acc_y = -b.acceleration;
+            b.acc.y = -b.acceleration;
         }
 
         if(DOWN){
-            b.acc_y = b.acceleration;
+            b.acc.y = b.acceleration;
         }
 
         if(LEFT){
-            b.acc_x = -b.acceleration;
+            b.acc.x = -b.acceleration;
         }
 
         if(RIGHT){
-            b.acc_x = b.acceleration;
+            b.acc.x = b.acceleration;
         }
 
         if((!UP) && (!DOWN)){
-            b.acc_y = 0;
+            b.acc.y = 0;
         }
 
         if((!LEFT) && (!RIGHT)){
-            b.acc_x = 0;
+            b.acc.x = 0;
         }
 
-        b.vel_x += b.acc_x;
-        b.vel_y += b.acc_y;
-
-        b.x += b.vel_x;
-        b.y += b.vel_y;
+        b.vel = b.vel.add(b.acc);
+        b.vel = b.vel.mul(1-friction);
+          
+        b.x += b.vel.x;
+        b.y += b.vel.y;
 }
 
 function mainLoop(){
@@ -122,6 +158,7 @@ function mainLoop(){
         if(b.player){
             keyControl(b);
         }
+        b.display();
     });
     
     requestAnimationFrame(mainLoop);
